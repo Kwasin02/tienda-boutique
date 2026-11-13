@@ -45,8 +45,9 @@ describe("validateCart", () => {
 describe("buildOrderMessage", () => {
   it("incluye producto, talla, color, cantidades, precios y total", () => {
     const { lines } = validateCart([item({ quantity: 2 })], [vestido]);
-    const msg = buildOrderMessage(lines, "Mi tienda", makePriceFormatter("es-CO", "COP"));
+    const msg = buildOrderMessage(lines, "Mi tienda", makePriceFormatter("es-CO", "COP"), "P-ABC234");
     expect(msg).toContain("pedido en Mi tienda");
+    expect(msg).toContain("Pedido #P-ABC234");
     expect(msg).toContain("1. Vestido");
     expect(msg).toContain("Talla: M · Color: Arena");
     expect(msg).toMatch(/2 × \$\s96\.000 = \$\s192\.000/);

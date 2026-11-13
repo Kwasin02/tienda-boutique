@@ -1,0 +1,129 @@
+// Esquema de la tienda. SQLite en desarrollo; para PostgreSQL cambia `provider` y DATABASE_URL
+// (y el adaptador en database/client.ts). Ver README → Despliegue.
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  name        String
+  description String    @default("")
+  sortOrder   Int       @default(0)
+  products    Product[]
+}
+
+model Size {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  sortOrder Int       @default(0)
+  variants  Variant[]
+}
+
+model Color {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  hex      String?
+  variants Variant[]
+}
+
+model Product {
+  id             Int            @id @default(autoincrement())
+  slug           String         @unique
+  name           String
+  description    String         @default("")
+  /// Precio en pesos enteros (COP), sin decimales.
+  price          Int
+  compareAtPrice Int?
+  categoryId     Int
+  category       Category       @relation(fields: [categoryId], references: [id])
+  featured       Boolean        @default(false)
+  bestSeller     Boolean        @default(false)
+  /// Oculto de la tienda sin borrarlo.
+  active         Boolean        @default(true)
+  /// Contenido de demostración, no mercancía real.
+  demo           Boolean        @default(false)
+  images         ProductImage[]
+  variants       Variant[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String  @default("")
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+model Variant {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sizeId    Int
+  size      Size    @relation(fields: [sizeId], references: [id])
+  colorId   Int
+  color     Color   @relation(fields: [colorId], references: [id])
+  stock     Int     @default(0)
+
+  @@unique([productId, sizeId, colorId])
+}
+
+model Banner {
+  id        Int     @id @default(autoincrement())
+  eyebrow   String  @default("")
+  title     String
+  subtitle  String  @default("")
+  imageUrl  String?
+  linkUrl   String  @default("/catalogo")
+  linkLabel String  @default("Ver catálogo")
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+/// Pedido registrado al preparar el mensaje de WhatsApp. Es una intención de compra:
+/// la tienda la confirma en el chat y cambia su estado desde el panel.
+model Order {
+  id         Int         @id @default(autoincrement())
+  code       String      @unique
+  /// pendiente | confirmado | entregado | cancelado
+  status     String      @default("pendiente")
+  total      Int
+  itemsCount Int
+  items      OrderItem[]
+  createdAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id          Int    @id @default(autoincrement())
+  orderId     Int
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Copia de los datos al momento del pedido: el producto puede cambiar o borrarse después.
+  productSlug String
+  productName String
+  size        String
+  color       String
+  quantity    Int
+  unitPrice   Int
+
+  @@index([orderId])
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

@@ -55,7 +55,7 @@ export function validateCart(raw: unknown, products: Product[]) {
 
 export const orderTotal = (lines: OrderLine[]) => lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
 
-export function buildOrderMessage(lines: OrderLine[], storeName: string, format: (n: number) => string) {
+export function buildOrderMessage(lines: OrderLine[], storeName: string, format: (n: number) => string, code?: string) {
   const units = lines.reduce((n, l) => n + l.quantity, 0);
   const body = lines
     .map(
@@ -68,6 +68,7 @@ export function buildOrderMessage(lines: OrderLine[], storeName: string, format:
 
   return [
     `Hola, quiero hacer este pedido en ${storeName}:`,
+    ...(code ? [`Pedido #${code}`] : []),
     "",
     body,
     "",

@@ -1,13 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductGrid } from "@/components/tienda/ProductCard";
 import { button } from "@/components/ui/button";
 import { WhatsappIcon } from "@/components/ui/icons";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { getBestSellers, getCategories, getFeaturedProducts, getNewArrivals, getOnSale } from "@/services/catalog";
+import { getActiveBanner, getBestSellers, getCategories, getFeaturedProducts, getNewArrivals, getOnSale } from "@/services/catalog";
 import { whatsappLink } from "@/services/whatsapp";
 
 export default async function HomePage() {
-  const [categories, featured, bestSellers, newArrivals, onSale] = await Promise.all([
+  const [banner, categories, featured, bestSellers, newArrivals, onSale] = await Promise.all([
+    getActiveBanner(),
     getCategories(),
     getFeaturedProducts(),
     getBestSellers(),
@@ -18,25 +20,29 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Banner principal. En la Fase 6 se gestionará desde el panel (imagen, texto y enlace). */}
-      <section className="bg-arena">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:py-32">
-          <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-musgo">Nueva temporada</p>
-            <h1 className="mt-5 font-serif text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
-              Prendas serenas para vestir cada día
-            </h1>
-            <p className="mt-6 max-w-md leading-relaxed text-musgo">
-              Elige tu talla y color, arma tu pedido y confírmalo con nosotros por WhatsApp.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/catalogo" className={button.primary}>Ver catálogo</Link>
-              <Link href="/catalogo?orden=novedades" className={button.secondary}>Novedades</Link>
+      {/* Banner principal: se edita desde el panel admin. */}
+      {banner && (
+        <section className="bg-arena">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:py-32">
+            <div>
+              {banner.eyebrow && <p className="text-xs uppercase tracking-[0.25em] text-musgo">{banner.eyebrow}</p>}
+              <h1 className="mt-5 font-serif text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">{banner.title}</h1>
+              {banner.subtitle && <p className="mt-6 max-w-md leading-relaxed text-musgo">{banner.subtitle}</p>}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href={banner.linkUrl} className={button.primary}>{banner.linkLabel}</Link>
+                <Link href="/catalogo?orden=novedades" className={button.secondary}>Novedades</Link>
+              </div>
             </div>
+            {banner.imageUrl ? (
+              <div className="relative aspect-[4/5] overflow-hidden rounded-t-full max-lg:hidden">
+                <Image src={banner.imageUrl} alt="" fill priority sizes="50vw" className="object-cover" />
+              </div>
+            ) : (
+              <div aria-hidden="true" className="hidden aspect-[4/5] rounded-t-full bg-salvia/60 lg:block" />
+            )}
           </div>
-          <div aria-hidden="true" className="hidden aspect-[4/5] rounded-t-full bg-salvia/60 lg:block" />
-        </div>
-      </section>
+        </section>
+      )}
 
       <div className="mx-auto max-w-7xl space-y-20 px-4 pt-16 sm:px-6 sm:pt-20">
         <section aria-labelledby="colecciones">

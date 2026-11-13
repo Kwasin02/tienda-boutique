@@ -48,3 +48,6 @@ next-env.d.ts
 # base de datos local
 *.db
 *.db-journal
+
+# cliente generado por Prisma
+/database/generated

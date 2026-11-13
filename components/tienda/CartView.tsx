@@ -94,6 +94,7 @@ export function CartView({ locale, currency }: { locale: string; currency: strin
           {checkout && checkout.issues.length > 0 && (
             <ul className="space-y-1 rounded-lg bg-arena px-4 py-3 text-sm">
               {checkout.issues.map((m) => <li key={m}>{m}</li>)}
+              {!checkout.url && <li className="pt-1 font-medium">Revisa tu carrito y vuelve a pulsar Finalizar.</li>}
             </ul>
           )}
         </div>
