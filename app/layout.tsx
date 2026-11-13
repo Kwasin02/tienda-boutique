@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
-import { Footer } from "@/components/tienda/Footer";
-import { Header } from "@/components/tienda/Header";
 import { storeConfig } from "@/services/store-config";
 import "@/styles/globals.css";
 
@@ -26,13 +24,7 @@ export const viewport: Viewport = { themeColor: "#f8f6f0" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>
-      <body className="flex min-h-dvh flex-col">
-        <Header />
-        <main id="contenido" className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </body>
+      <body className="flex min-h-dvh flex-col">{children}</body>
     </html>
   );
 }

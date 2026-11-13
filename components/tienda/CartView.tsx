@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore, useTransition } from "react";
-import { prepareCheckout, type CheckoutResult } from "@/app/carrito/actions";
+import { prepareCheckout, type CheckoutResult } from "@/app/(tienda)/carrito/actions";
 import { button } from "@/components/ui/button";
 import { WhatsappIcon } from "@/components/ui/icons";
 import { ProductImage } from "@/components/ui/ProductImage";

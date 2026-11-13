@@ -127,3 +127,19 @@ model AdminUser {
   passwordHash String
   createdAt    DateTime @default(now())
 }
+
+/// Datos de contacto y contenido editable de la tienda (una sola fila, id = 1).
+model StoreSettings {
+  id        Int      @id @default(1)
+  about     String   @default("")
+  email     String   @default("")
+  address   String   @default("")
+  instagram String   @default("")
+  facebook  String   @default("")
+  tiktok    String   @default("")
+  /// Una línea por horario, p. ej. "Lunes a viernes: 9:00 a 18:00".
+  hours     String   @default("")
+  /// Preguntas frecuentes en JSON: [{ "q": "...", "a": "..." }]
+  faq       String   @default("[]")
+  updatedAt DateTime @updatedAt
+}

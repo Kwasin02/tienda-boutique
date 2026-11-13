@@ -51,3 +51,6 @@ next-env.d.ts
 
 # cliente generado por Prisma
 /database/generated
+
+# fotos subidas desde el panel
+/storage

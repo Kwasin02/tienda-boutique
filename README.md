@@ -2,7 +2,7 @@
 
 Tienda online de ropa: catálogo, variantes (talla y color), carrito persistente y checkout que abre WhatsApp con el pedido precargado. Incluirá panel administrativo protegido.
 
-> **Estado:** Fase 5 de 8 (base de datos y registro de pedidos). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
+> **Estado:** Fase 6 de 8 (panel administrativo). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
 
 ## Requisitos
 
@@ -38,9 +38,12 @@ Ver [`.env.example`](.env.example). Ninguna credencial va en el código. `WHATSA
 ## Estructura
 
 ```
-app/            rutas (App Router), layout, 404, favicon
-components/     ui/ (piezas genéricas) y tienda/ (header, footer, tarjetas)
-services/       acceso al catálogo, configuración, formato, WhatsApp
+app/(tienda)/   páginas públicas: inicio, catálogo, producto, carrito, contacto
+app/admin/      panel administrativo (login y secciones)
+app/uploads/    entrega de las fotos subidas
+proxy.ts        primera barrera de acceso a /admin
+components/     ui/ (piezas genéricas), tienda/ y admin/ (formularios)
+services/       catálogo, checkout, pedidos, auth, subidas, validación de formularios
 models/         tipos y reglas de dominio (promociones, stock)
 database/       esquema Prisma, migraciones, cliente, seed y datos DEMO
 styles/         tokens de la paleta y estilos globales
@@ -50,7 +53,28 @@ public/         archivos estáticos y uploads/
 
 ## Stack
 
-Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 7 (SQLite / PostgreSQL) · Vitest.
+Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 7 (SQLite / PostgreSQL) · Zod · Vitest.
+
+## Panel administrativo (`/admin`)
+
+Acceso con el correo y la contraseña de `ADMIN_EMAIL` / `ADMIN_INITIAL_PASSWORD` (los crea `npm run db:seed`). **Cambia la contraseña en Ajustes tras el primer acceso.**
+
+| Sección | Qué permite |
+|---|---|
+| Pedidos | Buscar por código (`P-XXXXXX`), filtrar por estado y cambiarlo (pendiente, confirmado, entregado, cancelado) |
+| Productos | Crear, editar, ocultar y eliminar; precio y precio anterior (promoción); destacado / más vendido; stock por talla y color; fotos |
+| Categorías, Tallas y colores | Altas, cambios, orden y borrado (no se borra lo que está en uso) |
+| Banners | Texto, enlace, imagen y orden del banner de portada |
+| Ajustes | Sobre la tienda, correo, dirección, redes, horarios, preguntas frecuentes y cambio de contraseña |
+
+Los cambios se ven en la tienda al instante (se invalida la caché del catálogo).
+
+**Seguridad del panel**
+- Contraseñas con scrypt; sesión en cookie `httpOnly` firmada con HMAC (`SESSION_SECRET`), 8 horas.
+- Cambiar la contraseña cierra las sesiones abiertas en otros dispositivos.
+- 5 intentos de acceso fallidos por IP cada 15 minutos.
+- `proxy.ts` bloquea `/admin` sin cookie y cada página y acción vuelve a verificar la sesión.
+- Fotos: solo JPG, PNG o WebP verificados por su contenido, máximo `MAX_UPLOAD_MB` MB, nombre aleatorio. Se guardan en `storage/uploads` (o `UPLOAD_DIR`) y se sirven en `/uploads/...`.
 
 ## Cómo funciona el pedido por WhatsApp
 
