@@ -40,3 +40,6 @@ export function discountPercent(p: Pick<Product, "price" | "compareAtPrice">) {
 export function totalStock(p: Pick<Product, "variants">) {
   return p.variants.reduce((sum, v) => sum + v.stock, 0);
 }
+
+/** Máximo de unidades por línea del carrito. */
+export const MAX_PER_LINE = 10;

@@ -2,7 +2,7 @@
 
 Tienda online de ropa: catálogo, variantes (talla y color), carrito persistente y checkout que abre WhatsApp con el pedido precargado. Incluirá panel administrativo protegido.
 
-> **Estado:** Fase 3 de 8 (catálogo con filtros y detalle de producto con variantes). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
+> **Estado:** Fase 4 de 8 (carrito y checkout por WhatsApp). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
 
 ## Requisitos
 
@@ -46,3 +46,9 @@ public/         archivos estáticos y uploads/
 ## Stack
 
 Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Vitest.
+
+## Cómo funciona el pedido por WhatsApp
+
+1. El carrito se guarda en el navegador (`localStorage`).
+2. Al pulsar **Finalizar pedido por WhatsApp**, el servidor revisa cada producto contra el catálogo: precio actual, variante existente y stock. Si algo cambió, corrige el carrito y avisa al cliente.
+3. Se muestra el mensaje exacto que se enviará y el botón **Abrir WhatsApp** (`https://wa.me/NUMERO?text=...`). El cliente revisa y envía; nada se envía solo.

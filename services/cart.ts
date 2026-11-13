@@ -2,6 +2,7 @@
 // Los precios guardados son solo para mostrar: en el checkout (Fase 4/5) el servidor los vuelve a validar.
 
 import { useSyncExternalStore } from "react";
+import { MAX_PER_LINE } from "@/models/product";
 
 export type CartItem = {
   slug: string;
@@ -14,7 +15,7 @@ export type CartItem = {
   image?: string;
 };
 
-export const MAX_PER_LINE = 10;
+export { MAX_PER_LINE };
 const STORAGE_KEY = "tienda.carrito.v1";
 
 export const itemKey = (i: Pick<CartItem, "slug" | "size" | "color">) => `${i.slug}|${i.size}|${i.color}`;
@@ -109,4 +110,6 @@ export const cart = {
   setQuantity: (key: string, quantity: number) => write(setQuantity(read(), key, quantity)),
   remove: (key: string) => write(removeFromCart(read(), key)),
   clear: () => write([]),
+  /** Sustituye el carrito por la versión validada por el servidor. */
+  replace: (items: CartItem[]) => write(items),
 };

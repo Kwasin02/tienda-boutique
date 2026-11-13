@@ -17,7 +17,7 @@ export function ProductImage({
       {src ? (
         <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
       ) : (
-        <div className="flex h-full items-center justify-center font-serif text-lg text-musgo" role="img" aria-label={`${alt} (sin fotografía)`}>
+        <div className="flex h-full items-center justify-center px-2 text-center font-serif text-base text-musgo" role="img" aria-label={`${alt} (sin fotografía)`}>
           Sin fotografía
         </div>
       )}
