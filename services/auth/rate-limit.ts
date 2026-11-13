@@ -2,9 +2,9 @@
 // shortcut: memoria de un solo proceso; con varias instancias del servidor, mover a la base de datos o Redis.
 
 type Bucket = { count: number; resetAt: number };
-const buckets = new Map<string, Bucket>();
 
 export function createRateLimiter(max: number, windowMs: number) {
+  const buckets = new Map<string, Bucket>(); // un contador independiente por limitador
   return {
     /** true si la clave ya superó el límite. */
     isBlocked(key: string, now = Date.now()) {

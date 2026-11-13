@@ -54,3 +54,9 @@ next-env.d.ts
 
 # fotos subidas desde el panel
 /storage
+
+# pruebas e2e
+/.next-e2e
+/test-results
+/playwright-report
+/database/e2e.db*

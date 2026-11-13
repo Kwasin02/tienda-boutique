@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { ActionState } from "@/components/admin/forms";
@@ -8,6 +7,7 @@ import { db } from "@/database/client";
 import { hashPassword, verifyPassword } from "@/services/auth/password";
 import { createRateLimiter } from "@/services/auth/rate-limit";
 import { endSession, startSession } from "@/services/auth/session";
+import { clientIp } from "@/services/request";
 
 // 5 intentos fallidos por IP cada 15 minutos.
 const limiter = createRateLimiter(5, 15 * 60_000);
@@ -16,7 +16,7 @@ const schema = z.object({ email: z.email().max(200), password: z.string().min(1)
 const dummyHash = hashPassword("contraseña-ficticia-de-relleno");
 
 export async function login(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() || "local";
+  const ip = await clientIp();
   if (limiter.isBlocked(ip)) return { error: "Demasiados intentos. Espera 15 minutos e inténtalo de nuevo." };
 
   const parsed = schema.safeParse({ email: formData.get("email"), password: formData.get("password") });

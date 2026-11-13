@@ -78,7 +78,7 @@ export default async function HomePage() {
         </section>
 
         {onSale.length > 0 && (
-          <section className="rounded-sm bg-salvia/35 px-4 py-12 sm:px-10">
+          <section className="rounded-sm bg-salvia/25 px-4 py-12 sm:px-10">
             <SectionHeading title="Promociones" href="/catalogo?promocion=1" linkLabel="Ver promociones" />
             <ProductGrid products={onSale} />
           </section>

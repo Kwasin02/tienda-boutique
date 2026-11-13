@@ -26,6 +26,8 @@ export async function generateMetadata({ params }: PageProps<"/producto/[slug]">
     title: product.name,
     description: product.description,
     alternates: { canonical: `/producto/${product.slug}` },
+    // Los productos de demostración no deben aparecer en buscadores.
+    ...(product.demo && { robots: { index: false } }),
     openGraph: { title: product.name, description: product.description, images: product.images.slice(0, 1) },
   };
 }

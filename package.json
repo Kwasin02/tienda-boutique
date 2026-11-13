@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.1",
@@ -23,6 +24,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",

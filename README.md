@@ -2,7 +2,7 @@
 
 Tienda online de ropa: catálogo, variantes (talla y color), carrito persistente y checkout que abre WhatsApp con el pedido precargado. Incluirá panel administrativo protegido.
 
-> **Estado:** Fase 6 de 8 (panel administrativo). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
+> **Estado:** Fase 7 de 8 (seguridad, responsive y pruebas). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
 
 ## Requisitos
 
@@ -27,6 +27,7 @@ npm run dev                  # http://localhost:3000
 | `npm start` | Sirve el build |
 | `npm run lint` | ESLint |
 | `npm test` | Pruebas unitarias (Vitest) |
+| `npm run test:e2e` | Pruebas de punta a punta en escritorio y móvil (Playwright). Usan su propia base de datos y build en el puerto 3100. La primera vez: `npx playwright install chromium` |
 | `npm run db:migrate` | Aplica/crea migraciones en desarrollo |
 | `npm run db:deploy` | Aplica migraciones en producción |
 | `npm run db:seed` | Carga datos base (con `SEED_DEMO=0` omite los productos DEMO) |
@@ -47,7 +48,7 @@ services/       catálogo, checkout, pedidos, auth, subidas, validación de form
 models/         tipos y reglas de dominio (promociones, stock)
 database/       esquema Prisma, migraciones, cliente, seed y datos DEMO
 styles/         tokens de la paleta y estilos globales
-tests/          pruebas unitarias
+tests/          unit/ (Vitest) y e2e/ (Playwright)
 public/         archivos estáticos y uploads/
 ```
 
@@ -75,6 +76,13 @@ Los cambios se ven en la tienda al instante (se invalida la caché del catálogo
 - 5 intentos de acceso fallidos por IP cada 15 minutos.
 - `proxy.ts` bloquea `/admin` sin cookie y cada página y acción vuelve a verificar la sesión.
 - Fotos: solo JPG, PNG o WebP verificados por su contenido, máximo `MAX_UPLOAD_MB` MB, nombre aleatorio. Se guardan en `storage/uploads` (o `UPLOAD_DIR`) y se sirven en `/uploads/...`.
+
+## Seguridad de la tienda
+
+- Cabeceras: Content-Security-Policy, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy y HSTS cuando `STORE_URL` es https.
+- Checkout: precios y stock se recalculan en el servidor; máximo 10 pedidos por IP y hora.
+- Validación con zod en el servidor para todo formulario; React escapa todo el contenido mostrado.
+- `robots.txt` excluye `/admin` y `/carrito`; los productos DEMO llevan `noindex` y no van al `sitemap.xml`.
 
 ## Cómo funciona el pedido por WhatsApp
 

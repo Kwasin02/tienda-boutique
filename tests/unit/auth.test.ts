@@ -34,4 +34,11 @@ describe("límite de intentos", () => {
     expect(rl.isBlocked("ip", 30)).toBe(true);
     expect(rl.isBlocked("ip", 2000)).toBe(false);
   });
+  it("cada limitador cuenta por separado", () => {
+    const a = createRateLimiter(1, 1000);
+    const b = createRateLimiter(1, 1000);
+    a.hit("ip", 0);
+    expect(a.isBlocked("ip", 1)).toBe(true);
+    expect(b.isBlocked("ip", 1)).toBe(false);
+  });
 });

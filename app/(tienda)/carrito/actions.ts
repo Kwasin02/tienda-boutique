@@ -1,11 +1,16 @@
 "use server";
 
+import { createRateLimiter } from "@/services/auth/rate-limit";
 import { getProductsForCheckout } from "@/services/catalog";
 import { buildOrderMessage, MAX_LINES, validateCart, type OrderLine } from "@/services/checkout";
 import { formatPrice } from "@/services/format";
 import { registerOrder } from "@/services/orders";
+import { clientIp } from "@/services/request";
 import { storeConfig } from "@/services/store-config";
 import { whatsappLink } from "@/services/whatsapp";
+
+// Evita llenar la base con pedidos falsos: 10 pedidos por IP cada hora.
+const orderLimiter = createRateLimiter(10, 60 * 60_000);
 
 export type CheckoutResult = { lines: OrderLine[]; issues: string[]; url: string | null; message?: string; error?: string };
 
@@ -23,8 +28,14 @@ export async function prepareCheckout(rawCart: unknown): Promise<CheckoutResult>
   // Si algo cambió, el cliente revisa el carrito corregido antes de registrar el pedido.
   if (issues.length > 0) return { lines, issues, url: null };
 
+  const ip = await clientIp();
+  if (orderLimiter.isBlocked(ip)) {
+    return { lines, issues, url: null, error: "Has preparado muchos pedidos seguidos. Espera un momento o escríbenos directamente por WhatsApp." };
+  }
+
   try {
     const code = await registerOrder(lines);
+    orderLimiter.hit(ip);
     const message = buildOrderMessage(lines, storeConfig.name, formatPrice, code);
     return { lines, issues, url: whatsappLink(message), message };
   } catch (e) {
