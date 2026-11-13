@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { BagIcon, MenuIcon, SearchIcon } from "@/components/ui/icons";
+import { CartLink } from "@/components/tienda/CartLink";
+import { MenuIcon, SearchIcon } from "@/components/ui/icons";
 import { storeConfig } from "@/services/store-config";
 
 export const navLinks = [
@@ -70,9 +71,7 @@ export function Header() {
           <SearchForm id="buscar" />
         </div>
 
-        <Link href="/carrito" className="flex size-11 items-center justify-center lg:ml-2" aria-label="Carrito">
-          <BagIcon className="size-6" />
-        </Link>
+        <CartLink />
       </div>
     </header>
   );

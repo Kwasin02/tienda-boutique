@@ -2,7 +2,7 @@
 
 Tienda online de ropa: catálogo, variantes (talla y color), carrito persistente y checkout que abre WhatsApp con el pedido precargado. Incluirá panel administrativo protegido.
 
-> **Estado:** Fase 2 de 8 (diseño visual y estructura frontend). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
+> **Estado:** Fase 3 de 8 (catálogo con filtros y detalle de producto con variantes). Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
 
 ## Requisitos
 
