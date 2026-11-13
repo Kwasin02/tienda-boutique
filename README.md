@@ -1,14 +1,78 @@
 # Tienda boutique con pedidos por WhatsApp
 
-Tienda online de ropa: catálogo, variantes (talla y color), carrito persistente y checkout que abre WhatsApp con el pedido precargado. Incluirá panel administrativo protegido.
+Tienda online de ropa con catálogo, tallas y colores, carrito y un checkout que **abre WhatsApp con el pedido ya escrito**. Incluye un panel de administración para gestionar productos, fotos, precios, promociones y pedidos sin tocar código.
 
-> **Estado:** Fases 1–8 completas. Lista para publicar. Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
+> Los productos marcados **DEMO** son contenido de demostración, no mercancía real.
 
-## Requisitos
+![Portada de la tienda](docs/capturas/portada.png)
+
+## Qué problema resuelve
+
+Muchas tiendas pequeñas venden por WhatsApp y no necesitan (o no pueden pagar) una pasarela de pago. Esta tienda permite que el cliente explore el catálogo, elija talla y color y arme su pedido. Al finalizar, se abre WhatsApp con un resumen ordenado (productos, tallas, colores, cantidades, precios y total) y un código de pedido. El cliente revisa el mensaje y lo envía; la tienda confirma pago y envío en el chat.
+
+## Funcionalidades
+
+| Tienda | Panel de administración |
+|---|---|
+| Catálogo con búsqueda (sin importar tildes), filtros por categoría, talla, color, precio y promoción | Login seguro y cambio de contraseña |
+| Ficha de producto con galería, variantes y stock por talla y color | Crear, editar, ocultar y eliminar productos; fotos; stock por variante |
+| Carrito que se conserva al recargar | Categorías, tallas, colores y banner de portada |
+| Checkout por WhatsApp con código de pedido | Pedidos con búsqueda por código y cambio de estado |
+| Página de contacto con horarios y preguntas frecuentes | Ajustes de contacto, redes, horarios y preguntas frecuentes |
+
+## Capturas
+
+| Catálogo con filtros | Ficha de producto en móvil |
+|---|---|
+| ![Catálogo](docs/capturas/catalogo.png) | ![Producto en móvil](docs/capturas/producto-movil.png) |
+
+| Carrito y mensaje de WhatsApp | Panel: productos |
+|---|---|
+| ![Carrito con el mensaje de WhatsApp](docs/capturas/carrito-whatsapp.png) | ![Lista de productos en el panel](docs/capturas/panel-productos.png) |
+
+| Panel: editar producto |
+|---|
+| ![Formulario de edición de producto](docs/capturas/panel-editar.png) |
+
+## Decisiones técnicas
+
+- **El servidor no confía en el carrito del navegador.** El carrito vive en `localStorage`, que el usuario puede modificar. Al finalizar, el servidor vuelve a leer precio, variante y stock de la base de datos, corrige el carrito y avisa al cliente si algo cambió (`services/checkout.ts`).
+- **Pedido registrado antes de abrir WhatsApp.** Cada pedido se guarda con un código (`P-XXXXXX`) que viaja en el mensaje, así la tienda lo encuentra en el panel.
+- **Autenticación sin librerías externas.** Contraseñas con `scrypt` y sesión en una cookie firmada con HMAC. Cambiar la contraseña invalida las demás sesiones (`services/auth/`).
+- **Fotos validadas por su contenido,** no por la extensión: un SVG renombrado a `.jpg` se rechaza (`services/uploads.ts`).
+- **SQLite + Docker con volumen** en lugar de una plataforma *serverless*: una boutique no necesita varios servidores, y así la base y las fotos viven en un disco persistente, con un costo de unos pocos dólares al mes.
+- **Caché del catálogo con invalidación:** las páginas de la tienda se sirven rápido desde caché y se actualizan al instante cuando se guarda algo en el panel.
+
+## Calidad
+
+- **40 pruebas unitarias** (Vitest): filtros, carrito, checkout, contraseñas, sesión, subidas y formularios.
+- **17 pruebas de punta a punta** (Playwright) en escritorio y móvil, sobre una base de datos aislada: compra completa, validaciones, panel, 404, cabeceras de seguridad y ausencia de scroll horizontal en móvil.
+- Contraste de colores revisado según WCAG AA; diseño pensado primero para móvil.
+
+## Cómo se construyó
+
+Este proyecto se desarrolló **con un asistente de IA (Claude, de Anthropic)**, que escribió el código. Los commits lo indican con la línea `Co-Authored-By`.
+
+Mi papel:
+
+- Definí los requisitos del negocio: catálogo, variantes, checkout por WhatsApp sin pasarela de pago, panel administrativo, paleta de colores y prioridades de seguridad.
+- Organicé el trabajo en 8 fases y revisé y aprobé cada una antes de pasar a la siguiente.
+- Tomé las decisiones de producto: moneda (COP), contenido de demostración identificado como tal y plataforma de despliegue.
+- Verifiqué el resultado en el navegador, en escritorio y móvil, en cada fase.
+
+La guía [docs/como-funciona.md](docs/como-funciona.md) explica cada parte del código en lenguaje simple.
+
+## Stack
+
+Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 7 (SQLite / PostgreSQL) · Zod · Vitest · Playwright · Docker.
+
+## Instalación local
+
+### Requisitos
 
 - Node.js 20.9 o superior y npm
 
-## Puesta en marcha
+### Puesta en marcha
 
 ```bash
 npm install
@@ -54,9 +118,6 @@ tests/          unit/ (Vitest) y e2e/ (Playwright)
 public/         archivos estáticos y uploads/
 ```
 
-## Stack
-
-Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 7 (SQLite / PostgreSQL) · Zod · Vitest.
 
 ## Panel administrativo (`/admin`)
 
@@ -150,3 +211,7 @@ Pon delante un proxy con HTTPS (por ejemplo Caddy: `tudominio.com { reverse_prox
 - [ ] Editar el banner de portada.
 - [ ] Hacer un pedido de prueba desde el celular y comprobar que llega bien a WhatsApp.
 - [ ] Comprobar `https://tu-dominio/robots.txt` y `/sitemap.xml`; dar de alta el sitio en Google Search Console.
+
+## Licencia
+
+[MIT](LICENSE).
