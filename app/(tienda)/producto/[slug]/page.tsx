@@ -16,7 +16,8 @@ export const instant = false;
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
-  return products.map((p) => ({ slug: p.slug }));
+  // Next.js 16 exige al menos un resultado; con la tienda aún vacía se usa uno que da 404.
+  return products.length ? products.map((p) => ({ slug: p.slug })) : [{ slug: "sin-productos" }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/producto/[slug]">): Promise<Metadata> {

@@ -60,3 +60,6 @@ next-env.d.ts
 /test-results
 /playwright-report
 /database/e2e.db*
+
+# copias de seguridad locales
+/backups

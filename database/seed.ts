@@ -1,8 +1,9 @@
-// Seed: crea tallas, colores, categorías base y el primer administrador.
-// Con SEED_DEMO=1 (por defecto en desarrollo) añade productos de DEMOSTRACIÓN marcados como tales.
-// Es idempotente: se puede ejecutar varias veces sin duplicar datos.
+// Seed: crea tallas, colores, categorías y banner base, y el primer administrador.
+// Cada bloque solo se crea si su tabla está VACÍA: nunca recrea lo que borraste desde el panel.
+// Por eso es seguro ejecutarlo en cada arranque del servidor (lo hace scripts/start.sh).
 //
-// Uso: npm run db:seed        (o SEED_DEMO=0 npm run db:seed para no cargar productos demo)
+// Productos de DEMOSTRACIÓN: solo con la tabla de productos vacía y SEED_DEMO distinto de "0".
+// Uso: npm run db:seed        (SEED_DEMO=0 npm run db:seed para no cargarlos)
 
 import { hashPassword } from "../services/auth/password";
 import { db } from "./client";
@@ -18,14 +19,14 @@ const COLORS: Record<string, string> = {
 };
 
 async function main() {
-  for (const [i, name] of SIZES.entries()) {
-    await db.size.upsert({ where: { name }, update: {}, create: { name, sortOrder: i } });
+  if ((await db.size.count()) === 0) {
+    await db.size.createMany({ data: SIZES.map((name, i) => ({ name, sortOrder: i })) });
   }
-  for (const [name, hex] of Object.entries(COLORS)) {
-    await db.color.upsert({ where: { name }, update: {}, create: { name, hex } });
+  if ((await db.color.count()) === 0) {
+    await db.color.createMany({ data: Object.entries(COLORS).map(([name, hex]) => ({ name, hex })) });
   }
-  for (const [i, c] of demoCategories.entries()) {
-    await db.category.upsert({ where: { slug: c.slug }, update: {}, create: { ...c, sortOrder: i } });
+  if ((await db.category.count()) === 0) {
+    await db.category.createMany({ data: demoCategories.map((c, i) => ({ ...c, sortOrder: i })) });
   }
 
   if ((await db.banner.count()) === 0) {
@@ -38,7 +39,7 @@ async function main() {
     });
   }
 
-  if (process.env.SEED_DEMO !== "0") {
+  if (process.env.SEED_DEMO !== "0" && (await db.product.count()) === 0) {
     for (const p of demoProducts) {
       if (await db.product.findUnique({ where: { slug: p.slug } })) continue;
       const category = await db.category.findUniqueOrThrow({ where: { slug: p.categorySlug } });
